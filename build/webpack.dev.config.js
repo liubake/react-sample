@@ -6,6 +6,7 @@ const modeEnvironment='development';
 
 let webpackConfig = webpackMerge(webpackBaseConfig, {
     mode: modeEnvironment,
+    devtool: 'source-map',
     plugins: [
         new webpack.DefinePlugin({
             'process.env': modeEnvironment
