@@ -1,9 +1,10 @@
-let merge = require('webpack-merge')
-let webpackBaseConfig = require('./webpack.base.config');
+let webpack = require('webpack')
+let webpackMerge = require('webpack-merge')
 let {devServerOptions} = require('../config');
+let webpackBaseConfig = require('./webpack.base.config');
 const modeEnvironment='production';
 
-let webpackConfig = merge(webpackBaseConfig, {
+let webpackConfig = webpackMerge(webpackBaseConfig, {
     mode: modeEnvironment,
     devtool: false,
     plugins: [

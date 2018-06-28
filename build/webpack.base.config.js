@@ -1,5 +1,6 @@
 let path = require('path');
 let {config} = require('../config');
+let htmlWebpackPlugin = require('html-webpack-plugin');
 
 let webpackconfig={
     entry: path.join(config.absoluteSource, config.entry),
@@ -27,6 +28,20 @@ let webpackconfig={
             }
         ],
     },
+    plugins: [
+        new htmlWebpackPlugin({
+            filename: path.join(config.absolutePacked, config.openPage),
+            template: path.join(config.absoluteSource, config.openPage),    
+            hash: true,
+            inject: true,
+            chunksSortMode: "dependency",
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+                collapseBooleanAttributes: true
+            }
+        })
+    ]
 };
 
 module.exports=webpackconfig;
