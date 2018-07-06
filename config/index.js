@@ -1,19 +1,60 @@
 let path = require('path');
+let glob = require('glob');
 
+/**
+ * 搜索指定目录指定扩展名的入口映射对象
+ * @param {*} basePath 
+ * @param {*} searchDir 
+ * @param {*} fielExtension 
+ */
+let getEntriesMap = (basePath, searchDir, fielExtension)=>{
+    let entriesMap = {}, map={}, entries={};
+    glob.sync(path.join(basePath, '**', searchDir, '*'+fielExtension)).forEach(function (entry) {
+        let relativePath = path.relative(basePath, entry);
+        let entryKey = relativePath.replace(fielExtension, '');
+        let mapKey = relativePath.replace(path.join(searchDir, path.basename(relativePath)), path.basename(relativePath, fielExtension));
+        map[mapKey] = entryKey;
+        entries[entryKey] = entry;
+    })
+    entriesMap['map'] = map;
+    entriesMap['entries'] = entries;
+    return entriesMap;
+};
+
+/**
+ * 打包相关配置项
+ */
 let config = Object.assign({
-    'entry':'app.js',
+    'root':'./',
     'source':'./source',
-    'packed':'./packed',
-    'openPage':'index.html',
-    'absoluteRoot': path.resolve('./')
+    'packed':'./packed'
 });
-
 config = Object.assign({
+    'absoluteRoot': path.resolve(config.root),
     'absoluteSource':path.resolve(config.source),
     'absolutePacked':path.resolve(config.packed)
 }, config);
+config = Object.assign({
+    'resolveRoot':config.absoluteSource,
+    'resolveCommon':path.join(config.absoluteSource, 'common'),
+    'resolveCommonjs':path.join(config.absoluteSource, 'common', 'js'),
+    'entriesMap':getEntriesMap(config.absoluteSource, 'js', '.js'),
+    'splitChunk':{
+        'vendor':{
+            'name': path.join('common', 'js', 'vendor'),
+            'testPath':'node_modules|util-.*'
+        },
+        'common':{
+            'name': path.join('common', 'js', 'common'),
+            'testPath': [config.source.replace(config.root,''), 'common','js','components'].join('\\\\')
+        }
+    }
+}, config);
 
-let devServerOptions={
+/**
+ * 开发服务器配置
+ */
+let devServerOptions = {
     after: (app) => {},
     // allowedHosts: [],
     before: (app) => {},
@@ -52,4 +93,4 @@ let devServerOptions={
     // watchOptions: {}
 }
 
-module.exports={config, devServerOptions}
+module.exports={getEntriesMap, config, devServerOptions}

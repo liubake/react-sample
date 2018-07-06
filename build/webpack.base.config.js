@@ -1,15 +1,32 @@
 let path = require('path');
-let {config} = require('../config');
+let {getEntriesMap, config} = require('../config');
 let htmlWebpackPlugin = require('html-webpack-plugin');
 
+/**
+ * 基础打包配置
+ */
 let webpackconfig={
-    entry: path.join(config.absoluteSource, config.entry),
+    entry: config.entriesMap.entries,
     output: {
-        filename: config.entry,
+        filename: '[name].js?ver=[chunkhash]',
+        chunkFilename:'[name].js?ver=[chunkhash]',
         path: config.absolutePacked
+    },
+    resolve: {
+        extensions: ['.js', '.json'],
+        alias:{
+            '@':config.resolveRoot,
+            '@common':config.resolveCommon,
+            '@commonjs':config.resolveCommonjs
+        }
     },
     module: {
         rules: [
+            {
+                test: /\.html$/,
+                exclude: /node_modules/,
+                loader: 'raw-loader'
+            },
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
@@ -20,28 +37,31 @@ let webpackconfig={
                         plugins: []
                     }
                 }
-            },
-            {
-                test: /\.html$/,
-                exclude: /node_modules/,
-                loader: 'raw-loader'
             }
-        ],
-    },
-    plugins: [
-        new htmlWebpackPlugin({
-            filename: path.join(config.absolutePacked, config.openPage),
-            template: path.join(config.absoluteSource, config.openPage),    
-            hash: true,
-            inject: true,
-            chunksSortMode: "dependency",
-            minify: {
-                removeComments: true,
-                collapseWhitespace: true,
-                collapseBooleanAttributes: true
-            }
-        })
-    ]
+        ]
+    }
 };
+
+/**
+ * 多入口打包配置
+ */
+webpackconfig.plugins = webpackconfig.plugins || [];
+let entryPagesMap = getEntriesMap(config.absoluteSource, 'page', '.html');
+for(let mapKey in entryPagesMap.map){
+    let entryPage = entryPagesMap.entries[entryPagesMap.map[mapKey]];
+    let relativePage = path.relative(config.absoluteSource, entryPage);
+    webpackconfig.plugins.push(new htmlWebpackPlugin({
+        inject: true,
+        template: entryPage,
+        filename: path.join(config.absolutePacked, relativePage),
+        chunksSortMode: "dependency",
+        chunks: [config.entriesMap.map[mapKey]].concat([config.splitChunk.vendor.name, config.splitChunk.common.name]),
+        minify: {
+            removeComments: true,
+            collapseWhitespace: true,
+            collapseBooleanAttributes: true
+        }
+    }))
+}
 
 module.exports=webpackconfig;
