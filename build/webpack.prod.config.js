@@ -1,9 +1,9 @@
 let webpack = require('webpack')
 let webpackMerge = require('webpack-merge')
-let uglifyJsPlugin=require('uglifyjs-webpack-plugin');
+let uglifyJsPlugin = require('uglifyjs-webpack-plugin');
 let webpackBaseConfig = require('./webpack.base.config');
 let {config} = require('../config');
-const modeEnvironment='production';
+const modeEnvironment = 'production';
 
 /**
  * 生产环境打包配置

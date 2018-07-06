@@ -3,21 +3,21 @@ let glob = require('glob');
 
 /**
  * 搜索指定目录指定扩展名的入口映射对象
- * @param {*} basePath 
- * @param {*} searchDir 
- * @param {*} fielExtension 
+ * @param {*} basePath
+ * @param {*} searchDir
+ * @param {*} fielExtension
  */
 let getEntriesMap = (basePath, searchDir, fielExtension)=>{
-    let entriesMap = {}, map={}, entries={};
-    glob.sync(path.join(basePath, '**', searchDir, '*'+fielExtension)).forEach(function (entry) {
-        let relativePath = path.relative(basePath, entry);
+    let entriesMap = {}, entryMap={}, entryList={};
+    glob.sync(path.join(basePath, '**', searchDir, '*'+fielExtension)).forEach(function (entryItem) {
+        let relativePath = path.relative(basePath, entryItem);
         let entryKey = relativePath.replace(fielExtension, '');
         let mapKey = relativePath.replace(path.join(searchDir, path.basename(relativePath)), path.basename(relativePath, fielExtension));
-        map[mapKey] = entryKey;
-        entries[entryKey] = entry;
+        entryMap[mapKey] = entryKey;
+        entryList[entryKey] = entryItem;
     })
-    entriesMap['map'] = map;
-    entriesMap['entries'] = entries;
+    entriesMap['entryMap'] = entryMap;
+    entriesMap['entryList'] = entryList;
     return entriesMap;
 };
 
@@ -38,7 +38,7 @@ config = Object.assign({
     'resolveRoot':config.absoluteSource,
     'resolveCommon':path.join(config.absoluteSource, 'common'),
     'resolveCommonjs':path.join(config.absoluteSource, 'common', 'js'),
-    'entriesMap':getEntriesMap(config.absoluteSource, 'js', '.js'),
+    'entriesScriptMap':getEntriesMap(config.absoluteSource, 'js', '.js'),
     'splitChunk':{
         'vendor':{
             'name': path.join('common', 'js', 'vendor'),
@@ -81,7 +81,7 @@ let devServerOptions = {
     port: '56789',
     // proxy: {},
     // progress: true,    // cli
-    // public: "myapp.test:80", 
+    // public: "myapp.test:80",
     publicPath: '/',
     // quiet: true,
     // socket: 'socket',

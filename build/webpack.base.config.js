@@ -6,7 +6,7 @@ let htmlWebpackPlugin = require('html-webpack-plugin');
  * 基础打包配置
  */
 let webpackconfig={
-    entry: config.entriesMap.entries,
+    entry: config.entriesScriptMap.entryList,
     output: {
         filename: '[name].js?ver=[chunkhash]',
         chunkFilename:'[name].js?ver=[chunkhash]',
@@ -47,15 +47,15 @@ let webpackconfig={
  */
 webpackconfig.plugins = webpackconfig.plugins || [];
 let entryPagesMap = getEntriesMap(config.absoluteSource, 'page', '.html');
-for(let mapKey in entryPagesMap.map){
-    let entryPage = entryPagesMap.entries[entryPagesMap.map[mapKey]];
+for (let mapKey in entryPagesMap.entryMap) {
+    let entryPage = entryPagesMap.entryList[entryPagesMap.entryMap[mapKey]];
     let relativePage = path.relative(config.absoluteSource, entryPage);
     webpackconfig.plugins.push(new htmlWebpackPlugin({
         inject: true,
         template: entryPage,
         filename: path.join(config.absolutePacked, relativePage),
         chunksSortMode: "dependency",
-        chunks: [config.entriesMap.map[mapKey]].concat([config.splitChunk.vendor.name, config.splitChunk.common.name]),
+        chunks: [config.entriesScriptMap.entryMap[mapKey]].concat([config.splitChunk.vendor.name, config.splitChunk.common.name]),
         minify: {
             removeComments: true,
             collapseWhitespace: true,
