@@ -19,6 +19,7 @@ let webpackConfig = webpackMerge(webpackBaseConfig, {
     optimization: {
         minimizer: [
             new uglifyJsPlugin({
+                sourceMap: true,
                 uglifyOptions: {
                     output: {
                         comments: false
