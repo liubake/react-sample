@@ -1,5 +1,5 @@
 let path = require('path');
-let {getEntriesMap, config} = require('../config');
+let {config, configHelper} = require('../config');
 let htmlWebpackPlugin = require('html-webpack-plugin');
 
 /**
@@ -8,8 +8,7 @@ let htmlWebpackPlugin = require('html-webpack-plugin');
 let webpackconfig={
     entry: config.entriesScriptMap.entryList,
     output: {
-        filename: '[name].js?ver=[chunkhash]',
-        chunkFilename:'[name].js?ver=[chunkhash]',
+        filename: '[name].js',
         path: config.absolutePacked
     },
     resolve: {
@@ -26,6 +25,14 @@ let webpackconfig={
                 test: /\.html$/,
                 exclude: /node_modules/,
                 loader: 'raw-loader'
+            },
+            {
+                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+                loader: 'url-loader',
+                options: {
+                    limit: 1024,
+                    name: '[path][name].[ext]?v=[hash]'
+                }
             },
             {
                 test: /\.js$/,
@@ -46,7 +53,7 @@ let webpackconfig={
  * 多入口打包配置
  */
 webpackconfig.plugins = webpackconfig.plugins || [];
-let entryPagesMap = getEntriesMap(config.absoluteSource, 'page', '.html');
+let entryPagesMap = configHelper.getEntriesMap(config.absoluteSource, 'page', '.html');
 for (let mapKey in entryPagesMap.entryMap) {
     let entryPage = entryPagesMap.entryList[entryPagesMap.entryMap[mapKey]];
     let relativePage = path.relative(config.absoluteSource, entryPage);

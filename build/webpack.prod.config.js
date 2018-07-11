@@ -1,9 +1,10 @@
 let webpack = require('webpack')
 let webpackMerge = require('webpack-merge')
-let uglifyJsPlugin = require('uglifyjs-webpack-plugin');
-let webpackBaseConfig = require('./webpack.base.config');
-let {config} = require('../config');
-const modeEnvironment = 'production';
+let copyWebpackPlugin = require('copy-webpack-plugin')
+let uglifyJsPlugin = require('uglifyjs-webpack-plugin')
+let webpackBaseConfig = require('./webpack.base.config')
+let {config, configHelper} = require('../config')
+const modeEnvironment = 'production'
 
 /**
  * 生产环境打包配置
@@ -11,6 +12,10 @@ const modeEnvironment = 'production';
 let webpackConfig = webpackMerge(webpackBaseConfig, {
     mode: modeEnvironment,
     devtool: 'source-map',
+    output: {
+        filename: '[name].js?ver=[chunkhash]',
+        chunkFilename:'[name].js?ver=[chunkhash]'
+    },
     optimization: {
         minimizer: [
             new uglifyJsPlugin({
@@ -50,8 +55,11 @@ let webpackConfig = webpackMerge(webpackBaseConfig, {
     plugins: [
         new webpack.DefinePlugin({
             'process.env': modeEnvironment
-        })
+        }),
+        new copyWebpackPlugin(
+            configHelper.getCopyDirs(config.copyDirs, config.absoluteSource, config.absolutePacked)
+        )
     ]
 });
 
-module.exports=webpackConfig;
+module.exports=webpackConfig

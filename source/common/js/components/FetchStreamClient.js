@@ -1,3 +1,5 @@
+const imgArray=['../image/test.gif','../../common/image/test.gif']
+
 let FetchStreamClient = {
     fetchedCall:null,
     tweetInterval : null,
@@ -13,7 +15,7 @@ let FetchStreamClient = {
             self.fetchedCall&&self.fetchedCall({
                 id:(new Date().getTime()).toString(),
                 text:'嘿嘿嘿...',
-                media:[{url:'file:///C:/Users/Erola/Pictures/Saved%20Pictures/v2-c88a0a781bd26c09fa85d4eab8d5c586_b.gif'}]
+                media:[{url:imgArray[parseInt(Math.random()*10)%2]}]
             });
         }, 100);
     }
